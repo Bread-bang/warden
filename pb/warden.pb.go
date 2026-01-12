@@ -7,13 +7,12 @@
 package pb
 
 import (
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
-
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
+	reflect "reflect"
+	sync "sync"
+	unsafe "unsafe"
 )
 
 const (
@@ -32,7 +31,12 @@ type Report struct {
 	// 가동 시간
 	Uptime int64 `protobuf:"varint,4,opt,name=uptime,proto3" json:"uptime,omitempty"`
 	// 정보 수집 시점
-	Timestamp     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Timestamp *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	// Network (Bytes)
+	NetSent uint64 `protobuf:"varint,6,opt,name=net_sent,json=netSent,proto3" json:"net_sent,omitempty"`
+	NetRecv uint64 `protobuf:"varint,7,opt,name=net_recv,json=netRecv,proto3" json:"net_recv,omitempty"`
+	// Disk Usage (%)
+	DiskUsage     float32 `protobuf:"fixed32,8,opt,name=disk_usage,json=diskUsage,proto3" json:"disk_usage,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -102,6 +106,27 @@ func (x *Report) GetTimestamp() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *Report) GetNetSent() uint64 {
+	if x != nil {
+		return x.NetSent
+	}
+	return 0
+}
+
+func (x *Report) GetNetRecv() uint64 {
+	if x != nil {
+		return x.NetRecv
+	}
+	return 0
+}
+
+func (x *Report) GetDiskUsage() float32 {
+	if x != nil {
+		return x.DiskUsage
+	}
+	return 0
+}
+
 type Command struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Action        string                 `protobuf:"bytes,1,opt,name=action,proto3" json:"action,omitempty"`
@@ -150,13 +175,17 @@ var File_warden_proto protoreflect.FileDescriptor
 
 const file_warden_proto_rawDesc = "" +
 	"\n" +
-	"\fwarden.proto\x12\x06warden\x1a\x1fgoogle/protobuf/timestamp.proto\"\xb1\x01\n" +
+	"\fwarden.proto\x12\x06warden\x1a\x1fgoogle/protobuf/timestamp.proto\"\x86\x02\n" +
 	"\x06Report\x12\x1b\n" +
 	"\twarden_id\x18\x01 \x01(\tR\bwardenId\x12\x1b\n" +
 	"\tcpu_usage\x18\x02 \x01(\x02R\bcpuUsage\x12\x1b\n" +
 	"\tmem_usage\x18\x03 \x01(\x02R\bmemUsage\x12\x16\n" +
 	"\x06uptime\x18\x04 \x01(\x03R\x06uptime\x128\n" +
-	"\ttimestamp\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\"!\n" +
+	"\ttimestamp\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x12\x19\n" +
+	"\bnet_sent\x18\x06 \x01(\x04R\anetSent\x12\x19\n" +
+	"\bnet_recv\x18\a \x01(\x04R\anetRecv\x12\x1d\n" +
+	"\n" +
+	"disk_usage\x18\b \x01(\x02R\tdiskUsage\"!\n" +
 	"\aCommand\x12\x16\n" +
 	"\x06action\x18\x01 \x01(\tR\x06action25\n" +
 	"\aCitadel\x12*\n" +

@@ -8,7 +8,6 @@ package pb
 
 import (
 	context "context"
-
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -27,7 +26,9 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CitadelClient interface {
-	// Warden streams reports to Citadel
+	// 메서드명: Watch
+	// 클라이언트 요청: Report (stream 방식)
+	// 서버 응답: Command
 	Watch(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[Report, Command], error)
 }
 
@@ -56,7 +57,9 @@ type Citadel_WatchClient = grpc.ClientStreamingClient[Report, Command]
 // All implementations must embed UnimplementedCitadelServer
 // for forward compatibility.
 type CitadelServer interface {
-	// Warden streams reports to Citadel
+	// 메서드명: Watch
+	// 클라이언트 요청: Report (stream 방식)
+	// 서버 응답: Command
 	Watch(grpc.ClientStreamingServer[Report, Command]) error
 	mustEmbedUnimplementedCitadelServer()
 }

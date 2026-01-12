@@ -22,6 +22,12 @@ message Report {
   int64 uptime = 4;
   // 정보 수집 시점
   google.protobuf.Timestamp timestamp = 5;
+
+  // Network (Bytes)
+  uint64 net_sent = 6;
+  uint64 net_recv = 7;
+  // Disk Usage (%)
+  float disk_usage = 8;
 }
 
 message Command {

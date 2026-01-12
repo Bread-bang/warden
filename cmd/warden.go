@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"Warden/collector"
 	"Warden/pb"
 	"context"
 	"log"
@@ -8,11 +9,7 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
-	"time"
 
-	"github.com/shirou/gopsutil/v3/cpu"
-	"github.com/shirou/gopsutil/v3/host"
-	"github.com/shirou/gopsutil/v3/mem"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -58,21 +55,18 @@ var wardenCmd = &cobra.Command{
 		}
 
 		// 정보 수집
-		cpuUsage := make(chan float32)
-		memUsage := make(chan float32)
-		uptime := make(chan int64)
-
 		for {
-			go func() { cpuUsage <- getCpuUsage() }()
-			go func() { memUsage <- getMemUsage() }()
-			go func() { uptime <- getUptime() }()
+			m := collector.GetHostResources()
 
 			info := &pb.Report{
 				WardenId:  c.id,
 				Timestamp: timestamppb.Now(),
-				CpuUsage:  <-cpuUsage,
-				MemUsage:  <-memUsage,
-				Uptime:    <-uptime,
+				CpuUsage:  m.CpuUsage,
+				MemUsage:  m.MemUsage,
+				Uptime:    m.Uptime,
+				NetRecv:   m.NetRecv,
+				NetSent:   m.NetSent,
+				DiskUsage: m.DiskUsage,
 			}
 			if err := stream.Send(info); err != nil {
 				select {
@@ -96,25 +90,4 @@ func init() {
 	wardenCmd.Flags().StringP("port", "p", "50051", "Citadel server port")
 	wardenCmd.Flags().StringP("id", "i", "default-warden", "Unique ID for this Warden")
 	rootCmd.AddCommand(wardenCmd)
-}
-
-func getCpuUsage() float32 {
-	wg.Add(1)
-	defer wg.Done()
-	cpuInfo, _ := cpu.Percent(time.Second, false)
-	return float32(cpuInfo[0])
-}
-
-func getMemUsage() float32 {
-	wg.Add(1)
-	defer wg.Done()
-	mem, _ := mem.VirtualMemory()
-	return float32(mem.UsedPercent)
-}
-
-func getUptime() int64 {
-	wg.Add(1)
-	defer wg.Done()
-	uptime, _ := host.Uptime()
-	return int64(uptime)
 }
