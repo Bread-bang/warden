@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package warden;
+
+option go_package = "./pb";
+
+import "google/protobuf/timestamp.proto";
+
+service Citadel {
+  // 메서드명: Watch
+  // 클라이언트 요청: Report (stream 방식)
+  // 서버 응답: Command
+  rpc Watch(stream Report) returns (Command);
+}
+
+message Report {
+  string warden_id = 1;
+  // Host Resource
+  float cpu_usage = 2;
+  float mem_usage = 3;
+  // 가동 시간
+  int64 uptime = 4;
+  // 정보 수집 시점
+  google.protobuf.Timestamp timestamp = 5;
+}
+
+message Command {
+  string action = 1;
+}
