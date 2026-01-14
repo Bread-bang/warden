@@ -22,6 +22,10 @@ type Metrics struct {
 
 var wg sync.WaitGroup
 
+var isFirstMetric bool = true
+var lastNetSent uint64
+var lastNetRecv uint64
+
 func GetHostResources() Metrics {
 	var m Metrics
 
@@ -88,7 +92,24 @@ func getNetInfo() (uint64, uint64) {
 	if len(io) == 0 {
 		return 0, 0
 	}
-	return io[0].BytesSent, io[0].BytesRecv
+
+	if isFirstMetric {
+		isFirstMetric = false
+		lastNetSent = io[0].BytesSent
+		lastNetRecv = io[0].BytesRecv
+		return 0, 0
+	}
+
+	currSent := io[0].BytesSent
+	currRecv := io[0].BytesRecv
+
+	diffNetSent := currSent - lastNetSent
+	diffNetRecv := currRecv - lastNetRecv
+
+	lastNetSent = currSent
+	lastNetRecv = currRecv
+
+	return diffNetSent, diffNetRecv
 }
 
 func getDiskUsage() float32 {

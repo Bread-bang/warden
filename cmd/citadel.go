@@ -31,17 +31,17 @@ func (s *server) Watch(stream pb.Citadel_WatchServer) error {
 
 		formattedTime := report.GetTimestamp().AsTime().Format("2006-01-02 15:04:05")
 		uptime := time.Duration(report.GetUptime()) * time.Second
-		netSentMB := float64(report.GetNetSent()) / 1024 / 1024
-		netRecvMB := float64(report.GetNetRecv()) / 1024 / 1024
+		netSentKB := float64(report.GetNetSent()) / 1024
+		netRecvKB := float64(report.GetNetRecv()) / 1024
 
-		fmt.Printf("[%v] %s: CPU %.2f%%, MEM %.2f%%, DISK %.2f%%, NET SENT %.2f MiB, NET RECV %.2f MiB, UPTIME %v\n",
+		fmt.Printf("[%v] %s: CPU %.2f%%, MEM %.2f%%, DISK %.2f%%, NET SENT %.2f KB, NET RECV %.2f KB, UPTIME %v\n",
 			formattedTime,
 			report.GetWardenId(),
 			report.GetCpuUsage(),
 			report.GetMemUsage(),
 			report.GetDiskUsage(),
-			netSentMB,
-			netRecvMB,
+			netSentKB,
+			netRecvKB,
 			uptime)
 	}
 }
